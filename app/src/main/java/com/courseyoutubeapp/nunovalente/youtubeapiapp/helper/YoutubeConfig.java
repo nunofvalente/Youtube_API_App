@@ -5,7 +5,7 @@ import com.courseyoutubeapp.nunovalente.youtubeapiapp.BuildConfig;
 public class YoutubeConfig {
 
     private static final String YOUTUBE_API_KEY = BuildConfig.ApiKey;
-    private static String CHANNEL_ID = "UC2fVSthyWxWSjsiEAHPzriQ";
+    private static String CHANNEL_ID = "UCVHFbqXqoYvEWM1Ddxl0QDg";
     private static String BASE_URL = "https://www.googleapis.com/youtube/v3/";
 
 
@@ -20,3 +20,4 @@ public class YoutubeConfig {
     }
 
 }
+

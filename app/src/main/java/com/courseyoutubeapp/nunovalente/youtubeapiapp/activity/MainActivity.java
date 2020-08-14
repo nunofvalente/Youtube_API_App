@@ -6,16 +6,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.BuildConfig;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.R;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.adapter.VideoAdapter;
-import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.VideoModel;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.api.YoutubeService;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.helper.RetrofitConfig;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.helper.YoutubeConfig;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.Items;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.ResultModel;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private MaterialSearchView searchView;
     private RecyclerView recyclerVideos;
     private VideoAdapter videoAdapter;
-    private List<VideoModel> videoModelList = new ArrayList<>();
+    private List<Items> videos = new ArrayList<>();
+    private ResultModel resultModel;
+
+    private Retrofit retrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,31 +46,40 @@ public class MainActivity extends AppCompatActivity {
 
         searchView = findViewById(R.id.search_view);
         recyclerVideos = findViewById(R.id.recyclerVideos);
+        retrofit = RetrofitConfig.getRetrofit();
 
         configureToolbar();
-        configureRecyclerView();
         recoverVideos();
         setListeners();
     }
 
     private void recoverVideos() {
-        VideoModel video1 = new VideoModel();
-        video1.setTitle("Video interesting");
-        videoModelList.add(video1);
+        YoutubeService youtubeService = retrofit.create(YoutubeService.class);
 
-        VideoModel video2 = new VideoModel();
-        video2.setTitle("Video not interesting");
-        videoModelList.add(video2);
+        Call<ResultModel> call = youtubeService.recoverVideos("snippet", "date", "20", BuildConfig.ApiKey, YoutubeConfig.getChannelId());
 
-        VideoModel video3 = new VideoModel();
-        video3.setTitle("Video for test");
-        videoModelList.add(video3);
+        call.enqueue(new Callback<ResultModel>() {
+            @Override
+            public void onResponse(Call<ResultModel> call, Response<ResultModel> response) {
+                if (response.isSuccessful()) {
+                    ResultModel result = response.body();
+                    Log.d("Result", "Result: " + result.items.get(0).id.videoId);
+                    videos = result.items;
+                    configureRecyclerView();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResultModel> call, Throwable t) {
+
+            }
+        });
 
 
     }
 
     private void configureRecyclerView() {
-        videoAdapter = new VideoAdapter(getApplicationContext(), videoModelList);
+        videoAdapter = new VideoAdapter(getApplicationContext(), videos);
         recyclerVideos.setAdapter(videoAdapter);
         recyclerVideos.setHasFixedSize(true);
         recyclerVideos.setLayoutManager(new LinearLayoutManager(getApplicationContext()));

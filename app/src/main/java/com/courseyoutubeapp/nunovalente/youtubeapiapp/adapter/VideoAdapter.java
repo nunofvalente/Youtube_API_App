@@ -11,16 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.R;
-import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.VideoModel;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.Items;
 
 import java.util.List;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyVideoViewHolder> {
 
     Context context;
-    List<VideoModel> videoModelList;
+    List<Items> videoModelList;
 
-    public VideoAdapter(Context context, List<VideoModel> videoModelList) {
+    public VideoAdapter(Context context, List<Items> videoModelList) {
         this.context = context;
         this.videoModelList = videoModelList;
     }
@@ -48,9 +48,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyVideoViewH
 
     @Override
     public void onBindViewHolder(@NonNull MyVideoViewHolder holder, int position) {
-        VideoModel videoModel = videoModelList.get(position);
+        Items video = videoModelList.get(position);
 
-        holder.textTitle.setText(videoModel.getTitle());
+        holder.textTitle.setText(video.snippet.title);
         holder.youTubePlayerView.setImageResource(R.drawable.padrao);
     }
 
