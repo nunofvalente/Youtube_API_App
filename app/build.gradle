@@ -49,4 +49,7 @@ dependencies {
     //searchview
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 }

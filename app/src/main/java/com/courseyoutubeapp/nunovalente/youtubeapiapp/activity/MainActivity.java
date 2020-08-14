@@ -5,10 +5,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.BuildConfig;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.R;
@@ -16,6 +19,7 @@ import com.courseyoutubeapp.nunovalente.youtubeapiapp.adapter.VideoAdapter;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.api.YoutubeService;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.helper.RetrofitConfig;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.helper.YoutubeConfig;
+import com.courseyoutubeapp.nunovalente.youtubeapiapp.listener.RecyclerItemClickListener;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.Items;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.ResultModel;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
@@ -49,21 +53,23 @@ public class MainActivity extends AppCompatActivity {
         retrofit = RetrofitConfig.getRetrofit();
 
         configureToolbar();
-        recoverVideos();
+        recoverVideos("");
         setListeners();
     }
 
-    private void recoverVideos() {
+
+    private void recoverVideos(String search) {
+
+        String q = search.replaceAll(" ", "+");
         YoutubeService youtubeService = retrofit.create(YoutubeService.class);
 
-        Call<ResultModel> call = youtubeService.recoverVideos("snippet", "date", "20", BuildConfig.ApiKey, YoutubeConfig.getChannelId());
+        Call<ResultModel> call = youtubeService.recoverVideos("snippet", "date", "20", BuildConfig.ApiKey, YoutubeConfig.getChannelId(), q);
 
         call.enqueue(new Callback<ResultModel>() {
             @Override
             public void onResponse(Call<ResultModel> call, Response<ResultModel> response) {
                 if (response.isSuccessful()) {
                     ResultModel result = response.body();
-                    Log.d("Result", "Result: " + result.items.get(0).id.videoId);
                     videos = result.items;
                     configureRecyclerView();
                 }
@@ -84,14 +90,36 @@ public class MainActivity extends AppCompatActivity {
         recyclerVideos.setHasFixedSize(true);
         recyclerVideos.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
+        recyclerVideos.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerVideos, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Items video = videos.get(position);
+                String idVideo = video.id.videoId;
+
+                Intent i = new Intent(MainActivity.this, PlayerActivity.class);
+                i.putExtra("videoId", idVideo);
+                startActivity(i);
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        }));
+
     }
 
     private void setListeners() {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Do some magic
-                return false;
+                recoverVideos(query);
+                return true;
             }
 
             @Override
@@ -109,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSearchViewClosed() {
-                //Do some magic
+                recoverVideos("");
             }
         });
     }

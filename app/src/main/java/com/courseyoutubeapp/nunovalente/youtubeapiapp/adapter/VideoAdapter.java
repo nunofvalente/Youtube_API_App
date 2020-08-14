@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.R;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.Items;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -49,9 +50,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyVideoViewH
     @Override
     public void onBindViewHolder(@NonNull MyVideoViewHolder holder, int position) {
         Items video = videoModelList.get(position);
-
         holder.textTitle.setText(video.snippet.title);
-        holder.youTubePlayerView.setImageResource(R.drawable.padrao);
+
+        String url = video.snippet.thumbnails.high.url;
+        Picasso.get().load(url).into(holder.youTubePlayerView);
     }
 
     @Override
