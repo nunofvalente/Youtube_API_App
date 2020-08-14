@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.R;
 import com.courseyoutubeapp.nunovalente.youtubeapiapp.model.VideoModel;
-import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.List;
 
